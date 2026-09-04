@@ -3,211 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vòng Quay May Mắn</title>
+    <title>Hệ Thống Vòng Quay May Mắn</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #1a1a2e;
-            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
 
         .card {
-            background: #16213e;
-            padding: 20px;
+            background: #1e1e2e;
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
             text-align: center;
-            width: 320px;
+            width: 100%;
+            max-width: 360px;
             margin-bottom: 20px;
         }
 
-        input {
-            width: 90%;
+        .tab-group {
+            display: flex;
+            margin-bottom: 15px;
+            background: #2a2a3d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            flex: 1;
             padding: 10px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #0f3460;
-            background: #0f3460;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #e94560;
             color: #fff;
         }
 
-        button {
-            width: 95%;
-            padding: 10px;
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #2b2b36;
+            color: #fff;
+            outline: none;
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 12px;
             margin-top: 10px;
             border: none;
             border-radius: 6px;
             background: #e94560;
             color: #fff;
             font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
         }
 
-        button:hover { background: #ff6b81; }
-
-        /* Vòng quay CSS */
-        .wheel-container {
-            position: relative;
-            width: 320px;
-            height: 320px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        button.action-btn:hover {
+            background: #ff6b81;
         }
 
-        .pointer {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #ff0000;
-            z-index: 10;
-        }
-
-        canvas {
-            border-radius: 50%;
-            border: 5px solid #fff;
-            transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 1);
-        }
-
-        /* Khung thông báo Ban */
+        /* Khung thông báo Khóa/Ban tài khoản */
         .ban-box {
-            background: #4a0e17;
+            background: #3a131a;
             border: 2px solid #ff4d4d;
             color: #ffcccc;
             padding: 15px;
             border-radius: 8px;
             margin-top: 15px;
             display: none;
+            text-align: left;
         }
 
-        .hidden { display: none; }
+        /* Vòng quay may mắn */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ff4d4d;
+            z-index: 10;
+        }
+
+        canvas {
+            border-radius: 50%;
+            border: 4px solid #fff;
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 1);
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- KHU VỰC ĐĂNG NHẬP -->
-    <div id="login-section" class="card">
-        <h2>Đăng Nhập</h2>
-        <input type="text" id="username" placeholder="Tên tài khoản">
-        <input type="password" id="password" placeholder="Mật khẩu">
-        <button onclick="login()">Đăng Nhập</button>
+    <!-- KHU VỰC TÀI KHOẢN (ĐĂNG NHẬP / ĐĂNG KÝ) -->
+    <div id="auth-section" class="card">
+        <div class="tab-group">
+            <button class="tab-btn active" id="btn-tab-login" onclick="switchTab('login')">Đăng Nhập</button>
+            <button class="tab-btn" id="btn-tab-register" onclick="switchTab('register')">Đăng Ký</button>
+        </div>
+
+        <!-- Form Đăng Nhập -->
+        <div id="form-login">
+            <input type="text" id="login-username" placeholder="Tên tài khoản">
+            <input type="password" id="login-password" placeholder="Mật khẩu">
+            <button class="action-btn" onclick="handleLogin()">Xác Nhận Đăng Nhập</button>
+        </div>
+
+        <!-- Form Đăng Ký -->
+        <div id="form-register" class="hidden">
+            <input type="text" id="reg-username" placeholder="Nhập tên tài khoản mới">
+            <input type="password" id="reg-password" placeholder="Nhập mật khẩu">
+            <button class="action-btn" style="background: #2ecc71;" onclick="handleRegister()">Tạo Tài Khoản</button>
+        </div>
         
-        <!-- Khung hiển thị thông báo nếu tài khoản bị Ban -->
+        <!-- Khung hiển thị lý do Ban (Khóa tài khoản) -->
         <div id="ban-message" class="ban-box">
-            <h3 style="margin-top: 0;">TÀI KHOẢN BỊ KHÓA!</h3>
-            <p id="ban-reason-text"></p>
+            <h4 style="color: #ff4d4d; margin-bottom: 5px;">TÀI KHOẢN ĐÃ BỊ KHÓA!</h4>
+            <p id="ban-reason-text" style="font-size: 14px;"></p>
         </div>
     </div>
 
-    <!-- KHU VỰC VÒNG QUAY (Sau khi đăng nhập) -->
+    <!-- KHU VỰC CHƠI VÒNG QUAY -->
     <div id="game-section" class="card hidden">
-        <h2>Xin chào, <span id="user-display"></span>!</h2>
+        <h3>Xin chào, <span id="user-display" style="color: #e94560;"></span>!</h3>
         <div class="wheel-container">
             <div class="pointer"></div>
             <canvas id="wheel" width="300" height="300"></canvas>
         </div>
-        <button id="spin-btn" onclick="spinWheel()">QUAY NGAY</button>
-        <p id="result-text" style="font-weight: bold; color: #4eef90;"></p>
-        <button onclick="logout()" style="background: #555;">Đăng xuất</button>
+        <button id="spin-btn" class="action-btn" onclick="spinWheel()">QUAY NGAY</button>
+        <p id="result-text" style="font-weight: bold; color: #2ecc71; margin-top: 15px;"></p>
+        <button onclick="handleLogout()" style="background: #444; border: none; color: #fff; padding: 8px 15px; border-radius: 6px; margin-top: 15px; cursor: pointer;">Đăng xuất</button>
     </div>
 
-    <!-- KHU VỰC QUẢN LÝ BAN TÀI KHOẢN (Demo) -->
-    <div class="card" style="border: 1px dashed #ff4d4d;">
-        <h4 style="margin: 5px 0;">Bảng Điều Khiển (Ban Tài Khoản)</h4>
-        <input type="text" id="ban-target" placeholder="Tên TK muốn Ban">
-        <input type="text" id="ban-reason" placeholder="Lý do Ban">
-        <button onclick="banUser()" style="background: #d9534f;">Xác Nhận Ban</button>
+    <!-- BẢNG ĐIỀU KHIỂN KHÓA TÀI KHOẢN (Cho Quản Trị Viên / Test) -->
+    <div class="card" style="border: 1px dashed #ff4d4d; background: #161622;">
+        <h5 style="color: #ff4d4d; margin-bottom: 10px;">Quản Lý Khóa Tài Khoản (Ban)</h5>
+        <input type="text" id="ban-target" placeholder="Tên tài khoản muốn khóa">
+        <input type="text" id="ban-reason" placeholder="Lý do khóa tài khoản">
+        <button class="action-btn" style="background: #e74c3c; padding: 8px;" onclick="handleBanUser()">Thực Hiện Khóa</button>
     </div>
 
     <script>
-        // Danh sách các phần thưởng hiển thị chữ trên vòng quay
+        // Danh sách phần thưởng và màu sắc
         const prizes = ["10K VNĐ", "Mất Lượt", "50K VNĐ", "Chúc May Mắn", "100K VNĐ", "Thêm Lượt"];
         const colors = ["#f39c12", "#e74c3c", "#9b59b6", "#3498db", "#2ecc71", "#1abc9c"];
 
-        // Cơ sở dữ liệu tài khoản giả lập (Tài khoản vẫn tồn tại dù bị Ban)
-        let usersDB = {
-            "user1": { password: "123", isBanned: false, banReason: "" },
-            "user2": { password: "123", isBanned: true, banReason: "Sử dụng phần mềm gian lận vòng quay." }
+        // Cơ sở dữ liệu lưu tài khoản trên trình duyệt (Khởi tạo tài khoản mẫu)
+        let usersDB = JSON.parse(localStorage.getItem('wheel_users')) || {
+            "nguoidung1": { password: "123", isBanned: false, banReason: "" },
+            "nguoidung2": { password: "123", isBanned: true, banReason: "Vi phạm quy định sử dụng hệ thống." }
         };
 
-        let currentUser = null;
-        let isSpinning = false;
-        let currentRotation = 0;
+        function saveUsersDB() {
+            localStorage.setItem('wheel_users', JSON.stringify(usersDB));
+        }
 
-        // --- HÀM ĐĂNG NHẬP (ĐÃ XÓA TÀI KHOẢN ADMIN) ---
-        function login() {
-            const userIn = document.getElementById("username").value.trim();
-            const passIn = document.getElementById("password").value.trim();
+        // Chuyển tab Đăng nhập / Đăng ký
+        function switchTab(tab) {
+            document.getElementById("ban-message").style.display = "none";
+            if (tab === 'login') {
+                document.getElementById("btn-tab-login").classList.add("active");
+                document.getElementById("btn-tab-register").classList.remove("active");
+                document.getElementById("form-login").classList.remove("hidden");
+                document.getElementById("form-register").classList.add("hidden");
+            } else {
+                document.getElementById("btn-tab-register").classList.add("active");
+                document.getElementById("btn-tab-login").classList.remove("active");
+                document.getElementById("form-register").classList.remove("hidden");
+                document.getElementById("form-login").classList.add("hidden");
+            }
+        }
+
+        // --- ĐĂNG KÝ TÀI KHOẢN MỚI ---
+        function handleRegister() {
+            const username = document.getElementById("reg-username").value.trim();
+            const password = document.getElementById("reg-password").value.trim();
+
+            if (!username || !password) {
+                alert("Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!");
+                return;
+            }
+
+            if (username.toLowerCase().includes("admin")) {
+                alert("Không thể sử dụng tên tài khoản này!");
+                return;
+            }
+
+            if (usersDB[username]) {
+                alert("Tài khoản này đã tồn tại!");
+                return;
+            }
+
+            // Tạo tài khoản thành công
+            usersDB[username] = { password: password, isBanned: false, banReason: "" };
+            saveUsersDB();
+            alert("Đăng ký thành công! Hãy đăng nhập ngay.");
+            document.getElementById("reg-username").value = "";
+            document.getElementById("reg-password").value = "";
+            switchTab('login');
+        }
+
+        // --- ĐĂNG NHẬP (KHÔNG CÓ KHÁI NIỆM ADMIN Ở GIAO DIỆN) ---
+        function handleLogin() {
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value.trim();
             const banBox = document.getElementById("ban-message");
 
             banBox.style.display = "none";
 
-            // Chặn hoàn toàn tất cả các dạng tài khoản admin
-            if (userIn.toLowerCase().includes("admin")) {
-                alert("Lỗi: Tài khoản admin đã bị xóa hoàn toàn khỏi hệ thống!");
+            if (username.toLowerCase().includes("admin")) {
+                alert("Tài khoản hoặc mật khẩu không chính xác!");
                 return;
             }
 
-            if (usersDB[userIn] && usersDB[userIn].password === passIn) {
-                // Kiểm tra xem tài khoản có bị Ban hay không
-                if (usersDB[userIn].isBanned) {
-                    document.getElementById("ban-reason-text").innerText = "Lý do: " + usersDB[userIn].banReason;
-                    banBox.style.display = "block"; // Hiển thị thông báo Ban cho người dùng thấy
+            if (usersDB[username] && usersDB[username].password === password) {
+                // Kiểm tra xem có bị KHÓA (BAN) không
+                if (usersDB[username].isBanned) {
+                    document.getElementById("ban-reason-text").innerText = "Lý do: " + usersDB[username].banReason;
+                    banBox.style.display = "block";
                     return;
                 }
 
-                // Nếu không bị Ban -> Đăng nhập thành công
-                currentUser = userIn;
-                document.getElementById("user-display").innerText = currentUser;
-                document.getElementById("login-section").classList.add("hidden");
+                // Vào game nếu tài khoản bình thường
+                document.getElementById("user-display").innerText = username;
+                document.getElementById("auth-section").classList.add("hidden");
                 document.getElementById("game-section").classList.remove("hidden");
                 drawWheel();
             } else {
-                alert("Tên đăng nhập hoặc mật khẩu không đúng!");
+                alert("Tài khoản hoặc mật khẩu không chính xác!");
             }
         }
 
-        function logout() {
-            currentUser = null;
-            document.getElementById("login-section").classList.remove("hidden");
+        function handleLogout() {
+            document.getElementById("auth-section").classList.remove("hidden");
             document.getElementById("game-section").classList.add("hidden");
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
+            document.getElementById("login-username").value = "";
+            document.getElementById("login-password").value = "";
         }
 
-        // --- HÀM BAN TÀI KHOẢN (GIỮ TÀI KHOẢN, CHỈ KHÓA VÀ LƯU LÝ DO) ---
-        function banUser() {
+        // --- THỰC HIỆN KHÓA TÀI KHOẢN VÀ LƯU LÝ DO ---
+        function handleBanUser() {
             const target = document.getElementById("ban-target").value.trim();
             const reason = document.getElementById("ban-reason").value.trim();
 
             if (!target || !reason) {
-                alert("Vui lòng nhập đầy đủ tên tài khoản và lý do Ban!");
+                alert("Vui lòng nhập tên tài khoản và lý do khóa!");
                 return;
             }
 
             if (usersDB[target]) {
                 usersDB[target].isBanned = true;
                 usersDB[target].banReason = reason;
-                alert(`Đã Ban tài khoản "${target}". Tài khoản vẫn lưu trên hệ thống nhưng người dùng sẽ thấy lý do Ban khi đăng nhập.`);
+                saveUsersDB();
+                alert(`Đã khóa tài khoản "${target}". Người dùng vẫn giữ được dữ liệu nhưng sẽ thấy lý do khóa khi đăng nhập.`);
                 document.getElementById("ban-target").value = "";
                 document.getElementById("ban-reason").value = "";
             } else {
-                alert("Không tìm thấy tài khoản này trong hệ thống!");
+                alert("Không tìm thấy tài khoản này!");
             }
         }
 
-        // --- VẼ VÒNG QUAY VỚI CHỮ ---
+        // --- VẼ VÒNG QUAY CÓ CHỮ ---
         const canvas = document.getElementById("wheel");
         const ctx = canvas.getContext("2d");
         const numPrizes = prizes.length;
@@ -217,7 +307,6 @@
             for (let i = 0; i < numPrizes; i++) {
                 const angle = i * arcSize;
                 
-                // Vẽ ô màu
                 ctx.beginPath();
                 ctx.fillStyle = colors[i];
                 ctx.moveTo(150, 150);
@@ -225,25 +314,27 @@
                 ctx.lineTo(150, 150);
                 ctx.fill();
 
-                // Vẽ chữ trên từng ô
+                // Vẽ chữ trên ô
                 ctx.save();
                 ctx.translate(150, 150);
                 ctx.rotate(angle + arcSize / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "#fff";
-                ctx.font = "bold 16px Arial";
+                ctx.font = "bold 15px Arial";
                 ctx.fillText(prizes[i], 130, 5);
                 ctx.restore();
             }
         }
 
-        // --- QUAY VÒNG QUAY ---
+        // --- VẬN HÀNH VÒNG QUAY ---
+        let isSpinning = false;
+        let currentRotation = 0;
+
         function spinWheel() {
             if (isSpinning) return;
             isSpinning = true;
             document.getElementById("result-text").innerText = "";
 
-            // Tính toán góc quay ngẫu nhiên (tối thiểu quay 5 vòng = 1800 độ)
             const randomDegree = Math.floor(Math.random() * 360) + 1800;
             currentRotation += randomDegree;
 
@@ -251,14 +342,11 @@
 
             setTimeout(() => {
                 isSpinning = false;
-                
-                // Tính toán phần thưởng trúng
                 const actualDegrees = currentRotation % 360;
-                // Góc 0 độ của canvas nằm ở bên phải (3 giờ), kim chỉ ở trên đỉnh (12 giờ = 270 độ)
                 const symbolAngle = (360 - (actualDegrees % 360) + 270) % 360;
                 const index = Math.floor(symbolAngle / (360 / numPrizes));
                 
-                document.getElementById("result-text").innerText = "Chúc mừng! Bạn quay vào: " + prizes[index];
+                document.getElementById("result-text").innerText = "Chúc mừng! Bạn nhận được: " + prizes[index];
             }, 4000);
         }
     </script>
