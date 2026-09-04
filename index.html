@@ -1,727 +1,266 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lớp Học Gamification & Đấu Trường Học Tập Super VIP</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-    .container { max-width: 1050px; margin: 0 auto; }
-    
-    /* Auth Form Style */
-    .auth-container { background: #1e293b; padding: 30px; border-radius: 16px; max-width: 400px; margin: 60px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
-    .auth-container h2 { margin-top: 0; color: #38bdf8; text-align: center; font-size: 24px; }
-    .auth-toggle { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-    .auth-toggle button { background: none; border: none; font-weight: bold; cursor: pointer; color: #94a3b8; padding-bottom: 5px; font-size: 16px; }
-    .auth-toggle button.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vòng Quay May Mắn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-    /* Dashboard Layout */
-    .header { background: #1e293b; padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-bottom: 20px; border: 1px solid #334155; }
-    .user-info-head { display: flex; align-items: center; gap: 12px; }
-    .avatar-frame { width: 48px; height: 48px; border-radius: 50%; border: 3px solid #fbbf24; display: flex; justify-content: center; align-items: center; font-size: 22px; background: #334155; }
-    .user-title { font-weight: bold; color: #f8fafc; font-size: 16px; }
-    .badge-rank { background: linear-gradient(90deg, #f59e0b, #d97706); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: #fff; margin-left: 6px; }
-    .badge { background: #334155; border: 1px solid #fbbf24; color: #fbbf24; padding: 6px 14px; border-radius: 20px; font-weight: bold; }
+        .card {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 320px;
+            margin-bottom: 20px;
+        }
 
-    /* VIP Panel */
-    .vip-panel { background: linear-gradient(135deg, #1e1b4b, #0f172a); color: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #4338ca; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-    .vip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 15px; }
-    .vip-stat { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
-    .vip-stat b { display: block; font-size: 18px; margin-top: 4px; color: #38bdf8; }
-    .progress { height: 10px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; margin-top: 8px; }
-    .progress > div { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); width: 0%; transition: width .4s; }
-    .vip-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-    .vip-btn { border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px; }
-    .vip-btn:hover { transform: translateY(-2px); }
-    .vip-btn.gold { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #0f172a; }
-    .vip-btn.purple { background: linear-gradient(90deg, #a855f7, #9333ea); color: #fff; }
-    .vip-btn.light { background: #334155; color: #fff; }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #0f3460;
+            background: #0f3460;
+            color: #fff;
+        }
 
-    /* Navigation Tabs */
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-    .tab-btn { padding: 10px 18px; border: none; background: #1e293b; color: #94a3b8; border-radius: 10px; font-weight: bold; cursor: pointer; white-space: nowrap; border: 1px solid #334155; }
-    .tab-btn.active { background: #0284c7; color: white; border-color: #38bdf8; }
+        button {
+            width: 95%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #e94560;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+        button:hover { background: #ff6b81; }
 
-    /* Learning Roadmap Map */
-    .roadmap { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; }
-    .node-card { background: #1e293b; border: 2px solid #334155; padding: 18px; border-radius: 16px; width: 100%; max-width: 500px; text-align: center; position: relative; }
-    .node-card.active { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
-    .node-card.locked { opacity: 0.5; filter: grayscale(1); }
-    .node-card.boss { border-color: #ef4444; background: linear-gradient(135deg, #450a0a, #1e293b); }
-    .arrow-down { font-size: 24px; color: #64748b; }
+        /* Vòng quay CSS */
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* General Grid & Cards */
-    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-    .card { background: #1e293b; padding: 18px; border-radius: 14px; text-align: center; border: 1px solid #334155; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-icon { font-size: 36px; margin-bottom: 8px; }
-    .card-title { font-weight: bold; margin-bottom: 5px; color: #f8fafc; }
-    .card-price { color: #fbbf24; font-weight: bold; margin-bottom: 12px; }
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ff0000;
+            z-index: 10;
+        }
 
-    /* Form & UI Elements */
-    .btn-action { background: #10b981; color: white; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; width: 100%; }
-    .btn-action:hover { opacity: 0.9; }
-    .btn-logout { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        canvas {
+            border-radius: 50%;
+            border: 5px solid #fff;
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 1);
+        }
 
-    .form-group { margin-bottom: 12px; text-align: left; }
-    .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #94a3b8; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #334155; background: #0f172a; color: #fff; border-radius: 8px; font-size: 14px; }
+        /* Khung thông báo Ban */
+        .ban-box {
+            background: #4a0e17;
+            border: 2px solid #ff4d4d;
+            color: #ffcccc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
 
-    /* Modal Styling */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-    .modal-box { background: #1e293b; padding: 25px; border-radius: 16px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; border: 1px solid #475569; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; }
-
-    /* Wheel Animation */
-    .wheel-container { text-align: center; position: relative; margin: 20px auto; width: 200px; height: 200px; }
-    .wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #fbbf24; background: conic-gradient(#ef4444 0 60deg, #3b82f6 60deg 120deg, #10b981 120deg 180deg, #f59e0b 180deg 240deg, #8b5cf6 240deg 300deg, #ec4899 300deg 360deg); transition: transform 4s cubic-bezier(0.15, 0.99, 0.18, 1); }
-    .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 24px; z-index: 10; }
-
-    /* Admin Panel Specifics */
-    .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    .admin-table th, .admin-table td { padding: 8px; border: 1px solid #334155; text-align: left; }
-    .admin-table th { background: #0f172a; color: #38bdf8; }
-
-    .toast { position: fixed; right: 20px; bottom: 20px; background: #38bdf8; color: #0f172a; font-weight: bold; padding: 12px 18px; border-radius: 10px; z-index: 3000; box-shadow: 0 6px 20px rgba(0,0,0,0.4); animation: toastIn .25s ease; }
-    @keyframes toastIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
-    .mission { text-align:left; border:1px solid #334155; border-radius:10px; padding:11px; margin:8px 0; background:#0f172a; }
-    .mission.done { background:#064e3b; border-color:#059669; }
-    .leader-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #334155; }
-  </style>
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
-  <!-- KHU VỰC ĐĂNG NHẬP / ĐĂNG KÝ -->
-  <div class="auth-container" id="authBox">
-    <h2>🎮 GAMIFIED ACADEMY</h2>
-    <div class="auth-toggle">
-      <button class="active" id="tabLoginBtn" onclick="toggleAuthMode('login')">Đăng Nhập</button>
-      <button id="tabRegisterBtn" onclick="toggleAuthMode('register')">Đăng Ký</button>
-    </div>
-
-    <div class="form-group">
-      <label>Tên tài khoản:</label>
-      <input type="text" id="authUsername" placeholder="Nhập username...">
-    </div>
-    <div class="form-group">
-      <label>Mật khẩu:</label>
-      <input type="password" id="authPassword" placeholder="Nhập mật khẩu...">
-    </div>
-
-    <button class="btn-action" id="authSubmitBtn" onclick="handleAuth()">Đăng Nhập</button>
-    <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 15px;">
-      * Mẹo: Tài khoản Admin: <b>admin</b> / Mật khẩu: <b>123456</b>
-    </p>
-  </div>
-
-  <!-- KHU VỰC GIAO DIỆN CHÍNH -->
-  <div class="container" id="mainDashboard" style="display: none;">
-    <!-- Header Profile -->
-    <div class="header">
-      <div class="user-info-head">
-        <div class="avatar-frame" id="displayAvatar">👤</div>
-        <div>
-          <div>
-            <span class="user-title" id="displayUsername">Học viên</span>
-            <span class="badge-rank" id="displayRank">Tân binh</span>
-          </div>
-          <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;" id="displayStatsMini">Win Rate: 0% | Quiz: 0%</div>
+    <!-- KHU VỰC ĐĂNG NHẬP -->
+    <div id="login-section" class="card">
+        <h2>Đăng Nhập</h2>
+        <input type="text" id="username" placeholder="Tên tài khoản">
+        <input type="password" id="password" placeholder="Mật khẩu">
+        <button onclick="login()">Đăng Nhập</button>
+        
+        <!-- Khung hiển thị thông báo nếu tài khoản bị Ban -->
+        <div id="ban-message" class="ban-box">
+            <h3 style="margin-top: 0;">TÀI KHOẢN BỊ KHÓA!</h3>
+            <p id="ban-reason-text"></p>
         </div>
-      </div>
-      <div>
-        <div class="badge" id="displayTrophies">🏆 0 Cúp</div>
-        <button class="btn-logout" onclick="logout()" style="margin-left: 10px;">Đăng xuất</button>
-      </div>
     </div>
 
-    <!-- VIP CENTER PANEL -->
-    <div class="vip-panel">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:12px;color:#94a3b8;">✨ VIP STUDENT CENTER</div>
-          <div style="font-size:22px;font-weight:800;color:#38bdf8;" id="levelTitle">Level 1 — Tân Binh</div>
+    <!-- KHU VỰC VÒNG QUAY (Sau khi đăng nhập) -->
+    <div id="game-section" class="card hidden">
+        <h2>Xin chào, <span id="user-display"></span>!</h2>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="300" height="300"></canvas>
         </div>
-        <div style="font-size:24px;" id="streakText">🔥 0 ngày</div>
-      </div>
-      <div style="margin-top:10px;font-size:12px;color:#cbd5e1;">Kinh nghiệm lên cấp: <span id="xpText">0 / 100 XP</span> <span id="comboBadge" style="color:#f59e0b;font-weight:bold;margin-left:10px;"></span></div>
-      <div class="progress"><div id="xpBar"></div></div>
-      <div class="vip-grid">
-        <div class="vip-stat">⭐ XP<b id="vipXP">0</b></div>
-        <div class="vip-stat">💎 Cúp<b id="vipTrophies">0</b></div>
-        <div class="vip-stat">🔥 Streak<b id="vipStreak">0</b></div>
-        <div class="vip-stat">⚔️ Thắng<b id="vipWins">0</b></div>
-      </div>
-      <div class="vip-actions">
-        <button class="vip-btn gold" onclick="claimDailyReward()">🎁 Nhận thưởng ngày</button>
-        <button class="vip-btn purple" onclick="openWheelModal()">🎰 Vòng quay</button>
-        <button class="vip-btn light" onclick="showMissions()">🎯 Nhiệm vụ</button>
-        <button class="vip-btn light" onclick="showLeaderboard()">🏆 BXH</button>
-        <button class="vip-btn light" id="adminBtn" style="display:none; background:#ef4444; color:#fff;" onclick="openAdminModal()">⚙️ ADMIN</button>
-      </div>
+        <button id="spin-btn" onclick="spinWheel()">QUAY NGAY</button>
+        <p id="result-text" style="font-weight: bold; color: #4eef90;"></p>
+        <button onclick="logout()" style="background: #555;">Đăng xuất</button>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('map-tab')">🗺️ Bản Đồ Học Tập</button>
-      <button class="tab-btn" onclick="switchTab('battle-tab')">⚔️ Đấu Trường</button>
-      <button class="tab-btn" onclick="switchTab('mystery-tab')">📦 Mystery Box</button>
-      <button class="tab-btn" onclick="completeMission('shop'); switchTab('cua-hang')">🛒 Cửa Hàng VIP</button>
+    <!-- KHU VỰC QUẢN LÝ BAN TÀI KHOẢN (Demo) -->
+    <div class="card" style="border: 1px dashed #ff4d4d;">
+        <h4 style="margin: 5px 0;">Bảng Điều Khiển (Ban Tài Khoản)</h4>
+        <input type="text" id="ban-target" placeholder="Tên TK muốn Ban">
+        <input type="text" id="ban-reason" placeholder="Lý do Ban">
+        <button onclick="banUser()" style="background: #d9534f;">Xác Nhận Ban</button>
     </div>
 
-    <!-- TAB 1: BẢN ĐỒ HỌC TẬP -->
-    <div id="map-tab" class="tab-content active">
-      <div class="roadmap" id="roadmapContainer"></div>
-    </div>
+    <script>
+        // Danh sách các phần thưởng hiển thị chữ trên vòng quay
+        const prizes = ["10K VNĐ", "Mất Lượt", "50K VNĐ", "Chúc May Mắn", "100K VNĐ", "Thêm Lượt"];
+        const colors = ["#f39c12", "#e74c3c", "#9b59b6", "#3498db", "#2ecc71", "#1abc9c"];
 
-    <!-- TAB 2: ĐẤU TRƯỜNG BATTLE -->
-    <div id="battle-tab" class="tab-content">
-      <div class="card" style="max-width: 500px; margin: 0 auto;">
-        <div class="card-icon">⚔️</div>
-        <div class="card-title" style="font-size: 20px;">Đấu Trường Lập Trình</div>
-        <p style="font-size: 13px; color: #94a3b8;">Thách đấu ngẫu nhiên với học viên khác. Trả lời 5 câu hỏi nhanh để giành chiến thắng!</p>
-        <button class="btn-action" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="startBattle()">VÀO THÁCH ĐẤU (+300 Cúp)</button>
-      </div>
-    </div>
+        // Cơ sở dữ liệu tài khoản giả lập (Tài khoản vẫn tồn tại dù bị Ban)
+        let usersDB = {
+            "user1": { password: "123", isBanned: false, banReason: "" },
+            "user2": { password: "123", isBanned: true, banReason: "Sử dụng phần mềm gian lận vòng quay." }
+        };
 
-    <!-- TAB 3: MYSTERY BOX -->
-    <div id="mystery-tab" class="tab-content">
-      <div class="grid-container">
-        <div class="card">
-          <div class="card-icon">📦</div>
-          <div class="card-title">Hộp Đồng (Bronze)</div>
-          <div class="card-price">🏆 100 Cúp</div>
-          <p style="font-size: 12px; color: #94a3b8;">Phần thưởng: 50 - 150 Cúp</p>
-          <button class="btn-action" onclick="openMysteryBox('bronze', 100)">Mở Hộp</button>
-        </div>
-        <div class="card">
-          <div class="card-icon">🎁</div>
-          <div class="card-title">Hộp Bạc (Silver)</div>
-          <div class="card-price">🏆 500 Cúp</div>
-          <p style="font-size: 12px; color: #94a3b8;">Phần thưởng: 200 - 800 Cúp</p>
-          <button class="btn-action" onclick="openMysteryBox('silver', 500)">Mở Hộp</button>
-        </div>
-        <div class="card">
-          <div class="card-icon">💎</div>
-          <div class="card-title">Hộp Vàng (Gold)</div>
-          <div class="card-price">🏆 1.500 Cúp</div>
-          <p style="font-size: 12px; color: #94a3b8;">Phần thưởng: 500 - 3.000 Cúp</p>
-          <button class="btn-action" onclick="openMysteryBox('gold', 1500)">Mở Hộp</button>
-        </div>
-        <div class="card">
-          <div class="card-icon">👑</div>
-          <div class="card-title">Hộp Huyền Thoại</div>
-          <div class="card-price">🏆 5.000 Cúp</div>
-          <p style="font-size: 12px; color: #94a3b8;">Phần thưởng: 3.000 - 15.000 Cúp</p>
-          <button class="btn-action" onclick="openMysteryBox('legendary', 5000)">Mở Hộp</button>
-        </div>
-      </div>
-    </div>
+        let currentUser = null;
+        let isSpinning = false;
+        let currentRotation = 0;
 
-    <!-- TAB 4: CỬA HÀNG -->
-    <div id="cua-hang" class="tab-content">
-      <div class="grid-container" id="shopGrid"></div>
-    </div>
-  </div>
+        // --- HÀM ĐĂNG NHẬP (ĐÃ XÓA TÀI KHOẢN ADMIN) ---
+        function login() {
+            const userIn = document.getElementById("username").value.trim();
+            const passIn = document.getElementById("password").value.trim();
+            const banBox = document.getElementById("ban-message");
 
-  <!-- MODAL VÒNG QUAY MAY MẮN -->
-  <div class="modal-overlay" id="wheelModal">
-    <div class="modal-box" style="text-align: center;">
-      <h3>🎰 Vòng Quay May Mắn</h3>
-      <div class="wheel-container">
-        <div class="wheel-pointer">▼</div>
-        <div class="wheel" id="wheelEl"></div>
-      </div>
-      <button class="btn-action" id="spinBtn" style="background:#f59e0b;" onclick="spinWheel()">QUAY NGAY!</button>
-      <div class="modal-actions">
-        <button style="background:#475569; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;" onclick="closeModal('wheelModal')">Đóng</button>
-      </div>
-    </div>
-  </div>
+            banBox.style.display = "none";
 
-  <!-- MODAL QUIZ & BOSS BATTLE -->
-  <div class="modal-overlay" id="quizModal">
-    <div class="modal-box">
-      <h3 id="quizTitle">🧠 BÀI KIỂM TRA</h3>
-      <div id="quizTimer" style="color: #ef4444; font-weight: bold; margin-bottom: 10px;">⏱️ Thời gian: 30s</div>
-      <div id="quizContent"></div>
-      <div class="modal-actions">
-        <button class="btn-action" onclick="submitQuiz()">Nộp Bài</button>
-      </div>
-    </div>
-  </div>
+            // Chặn hoàn toàn tất cả các dạng tài khoản admin
+            if (userIn.toLowerCase().includes("admin")) {
+                alert("Lỗi: Tài khoản admin đã bị xóa hoàn toàn khỏi hệ thống!");
+                return;
+            }
 
-  <!-- MODAL POPUP CHUNG -->
-  <div class="modal-overlay" id="generalModal">
-    <div class="modal-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h3 id="generalModalTitle" style="margin:0;color:#38bdf8;">Thông báo</h3>
-        <button onclick="closeModal('generalModal')" style="border:0;background:none;font-size:22px;cursor:pointer;color:#fff;">✕</button>
-      </div>
-      <div id="generalModalContent" style="margin-top:15px;"></div>
-    </div>
-  </div>
+            if (usersDB[userIn] && usersDB[userIn].password === passIn) {
+                // Kiểm tra xem tài khoản có bị Ban hay không
+                if (usersDB[userIn].isBanned) {
+                    document.getElementById("ban-reason-text").innerText = "Lý do: " + usersDB[userIn].banReason;
+                    banBox.style.display = "block"; // Hiển thị thông báo Ban cho người dùng thấy
+                    return;
+                }
 
-  <!-- MODAL ADMIN PANEL -->
-  <div class="modal-overlay" id="adminModal">
-    <div class="modal-box" style="max-width: 700px;">
-      <h3 style="color:#ef4444;">⚙️ ADMIN SYSTEM MANAGEMENT</h3>
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button class="tab-btn active" onclick="showAdminSection('users')">Quản lý Học Viên</button>
-        <button class="tab-btn" onclick="showAdminSection('stats')">Thống kê</button>
-      </div>
-      <div id="adminContent"></div>
-      <div class="modal-actions">
-        <button style="background:#475569; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;" onclick="closeModal('adminModal')">Đóng</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL ĐỔI QUÀ -->
-  <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-box">
-      <h3>Xác Nhận Đổi Quà VIP</h3>
-      <p id="selectedItemTxt" style="font-size: 14px; color: #fbbf24; font-weight: bold;"></p>
-      <div class="form-group">
-        <label>SĐT Nhận Hàng:</label>
-        <input type="text" id="custPhone" placeholder="09xx xxx xxx">
-      </div>
-      <div class="form-group">
-        <label>Địa Chỉ:</label>
-        <textarea id="custAddress" rows="2" placeholder="Nhập địa chỉ..."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button style="background:#475569; color:white; border:none; padding:8px 14px; border-radius:6px;" onclick="closeModal('checkoutModal')">Hủy</button>
-        <button class="btn-action" onclick="processOrder()">Xác Nhận Đổi</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // System Init & LocalStorage Setup
-    const DEFAULT_USERS = {
-      "admin": { password: "123456", name: "ADMINISTRATOR", trophies: 999999, isAdmin: true, xp: 5000, streak: 99, claimedToday: false, completedMissions:["login"], achievements:[], wins: 50, quizzesTaken: 20, correctAnswers: 190, unlockedNodes: [1,2,3,4,5] },
-      "hocvien1": { password: "123", name: "Nguyễn Văn A", trophies: 300, isAdmin: false, xp: 80, streak: 1, claimedToday: false, completedMissions:[], achievements:[], wins: 2, quizzesTaken: 3, correctAnswers: 20, unlockedNodes: [1] }
-    };
-
-    let usersDB = JSON.parse(localStorage.getItem('ACADEMY_USERS')) || DEFAULT_USERS;
-    let currentUser = null;
-    let comboMultiplier = 1;
-    let comboTimer = null;
-    let currentQuizData = null;
-    let quizInterval = null;
-    let currentSelectedItem = null;
-
-    const RANKS = [
-      { minXP: 0, name: "Tân binh", color: "#94a3b8" },
-      { minXP: 100, name: "Đồng", color: "#b45309" },
-      { minXP: 300, name: "Bạc", color: "#94a3b8" },
-      { minXP: 600, name: "Vàng", color: "#f59e0b" },
-      { minXP: 1000, name: "Kim Cương", color: "#06b6d4" },
-      { minXP: 2000, name: "Master", color: "#a855f7" },
-      { minXP: 5000, name: "Legend", color: "#ef4444" }
-    ];
-
-    const ROADMAP_NODES = [
-      { id: 1, title: "Buổi 1: Python Nhập Môn", type: "lesson", desc: "Học cú pháp cơ bản và biến trong Python", xp: 50, cups: 100 },
-      { id: 2, title: "Quiz: Kiểm Tra Python 1", type: "quiz", desc: "Thực hành 5 câu trắc nghiệm Python", xp: 100, cups: 150 },
-      { id: 3, title: "Buổi 2: Thiết Kế Web HTML/CSS", type: "lesson", desc: "Xây dựng giao diện Web cơ bản", xp: 80, cups: 120 },
-      { id: 4, title: "Quiz: Cấu Trúc Web", type: "quiz", desc: "Thực hành bài tập trắc nghiệm Web", xp: 120, cups: 200 },
-      { id: 5, title: "👹 BOSS: TRÙM LẬP TRÌNH", type: "boss", desc: "Đánh bại Trùm bằng 10 câu hỏi tổng hợp!", xp: 500, cups: 1000 }
-    ];
-
-    const MISSIONS = [
-      {id:"login", title:"Đăng nhập hằng ngày", desc:"Vào hệ thống hôm nay", xp:20, cups:50},
-      {id:"battle", title:"Tham gia Đấu Trường", desc:"Thách đấu 1 trận Battle", xp:50, cups:100},
-      {id:"shop", title:"Ghé thăm Cửa hàng", desc:"Mở danh mục quà tặng", xp:15, cups:30}
-    ];
-
-    const shopItems = [
-      { name: "Sổ Tay Lập Trình VIP", price: 500, icon: "📖" },
-      { name: "Móc Khóa Dev Limited", price: 800, icon: "🚀" },
-      { name: "Áo Thun Uniclass Master", price: 2500, icon: "👕" },
-      { name: "Bình Nước Giữ Nhiệt VIP", price: 4000, icon: "🥤" }
-    ];
-
-    function saveDB() {
-      localStorage.setItem('ACADEMY_USERS', JSON.stringify(usersDB));
-    }
-
-    function toggleAuthMode(mode) {
-      const isLogin = mode === 'login';
-      document.getElementById('tabLoginBtn').className = isLogin ? 'active' : '';
-      document.getElementById('tabRegisterBtn').className = !isLogin ? 'active' : '';
-      document.getElementById('authSubmitBtn').textContent = isLogin ? 'Đăng Nhập' : 'Tạo Tài Khoản Mới';
-    }
-
-    function handleAuth() {
-      const u = document.getElementById('authUsername').value.trim();
-      const p = document.getElementById('authPassword').value.trim();
-      if (!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
-
-      const isLogin = document.getElementById('tabLoginBtn').classList.contains('active');
-      if (isLogin) {
-        if (usersDB[u] && usersDB[u].password === p) {
-          currentUser = { username: u, ...usersDB[u] };
-          if(!currentUser.unlockedNodes) currentUser.unlockedNodes = [1];
-          initSession();
-        } else alert("Sai tài khoản hoặc mật khẩu!");
-      } else {
-        if (usersDB[u]) return alert("Tài khoản đã tồn tại!");
-        usersDB[u] = { password: p, name: u, trophies: 100, isAdmin: false, xp: 0, streak: 1, claimedToday: false, completedMissions:[], achievements:[], wins: 0, quizzesTaken: 0, correctAnswers: 0, unlockedNodes: [1] };
-        saveDB();
-        alert("Đăng ký thành công! Hãy đăng nhập.");
-        toggleAuthMode('login');
-      }
-    }
-
-    function initSession() {
-      document.getElementById('authBox').style.display = 'none';
-      document.getElementById('mainDashboard').style.display = 'block';
-      if(currentUser.isAdmin) document.getElementById('adminBtn').style.display = 'inline-block';
-      completeMission('login');
-      updateUI();
-      renderRoadmap();
-      renderShop();
-    }
-
-    function logout() {
-      saveDB();
-      currentUser = null;
-      document.getElementById('mainDashboard').style.display = 'none';
-      document.getElementById('authBox').style.display = 'block';
-    }
-
-    function getRank(xp) {
-      let current = RANKS[0];
-      for (const r of RANKS) if (xp >= r.minXP) current = r;
-      return current;
-    }
-
-    function updateUI() {
-      if (!currentUser) return;
-      const rank = getRank(currentUser.xp);
-      document.getElementById('displayUsername').textContent = currentUser.name;
-      document.getElementById('displayRank').textContent = rank.name;
-      document.getElementById('displayRank').style.background = rank.color;
-      document.getElementById('displayTrophies').textContent = `🏆 ${currentUser.trophies.toLocaleString()} Cúp`;
-
-      const totalQ = currentUser.quizzesTaken || 0;
-      const correctQ = currentUser.correctAnswers || 0;
-      const qRate = totalQ > 0 ? Math.round((correctQ / (totalQ * 5)) * 100) : 0;
-      document.getElementById('displayStatsMini').textContent = `Thắng: ${currentUser.wins||0} trận | Độ chính xác Quiz: ${qRate}%`;
-
-      document.getElementById('levelTitle').textContent = `Cấp độ Rank: ${rank.name}`;
-      document.getElementById('xpText').textContent = `${currentUser.xp} XP`;
-      document.getElementById('vipXP').textContent = currentUser.xp;
-      document.getElementById('vipTrophies').textContent = currentUser.trophies.toLocaleString();
-      document.getElementById('vipStreak').textContent = currentUser.streak || 1;
-      document.getElementById('vipWins').textContent = currentUser.wins || 0;
-      document.getElementById('streakText').textContent = `🔥 ${currentUser.streak||1} ngày`;
-
-      const pct = Math.min(100, (currentUser.xp / 2000) * 100);
-      document.getElementById('xpBar').style.width = pct + "%";
-
-      // Save sync
-      usersDB[currentUser.username] = { ...currentUser };
-      saveDB();
-    }
-
-    function addReward(xp, cups, reason) {
-      const finalXP = Math.round(xp * comboMultiplier);
-      currentUser.xp += finalXP;
-      currentUser.trophies += cups;
-      triggerCombo();
-      updateUI();
-      toast(`✨ +${finalXP} XP (x${comboMultiplier}) | +${cups} Cúp — ${reason}`);
-    }
-
-    function triggerCombo() {
-      comboMultiplier = Math.min(3, comboMultiplier + 0.2);
-      document.getElementById('comboBadge').textContent = `🔥 COMBO x${comboMultiplier.toFixed(1)}`;
-      clearTimeout(comboTimer);
-      comboTimer = setTimeout(() => {
-        comboMultiplier = 1;
-        document.getElementById('comboBadge').textContent = '';
-      }, 30000); // Reset combo sau 30s không làm bài
-    }
-
-    /* MAP / ROADMAP SYSTEM */
-    function renderRoadmap() {
-      const container = document.getElementById('roadmapContainer');
-      container.innerHTML = '';
-      ROADMAP_NODES.forEach((node, index) => {
-        const isUnlocked = currentUser.unlockedNodes.includes(node.id);
-        const card = document.createElement('div');
-        card.className = `node-card ${isUnlocked ? 'active' : 'locked'} ${node.type === 'boss' ? 'boss' : ''}`;
-        card.innerHTML = `
-          <h3>${isUnlocked ? '' : '🔒 '} ${node.title}</h3>
-          <p style="font-size: 13px; color: #94a3b8;">${node.desc}</p>
-          <div style="margin-top: 10px;">
-            <button class="btn-action" ${!isUnlocked ? 'disabled style="background:#475569;"' : ''} onclick="startNode(${node.id})">
-              ${isUnlocked ? 'THỰC HIỆN' : 'KHÓA'}
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-        if (index < ROADMAP_NODES.length - 1) {
-          const arrow = document.createElement('div');
-          arrow.className = 'arrow-down';
-          arrow.textContent = '▼';
-          container.appendChild(arrow);
+                // Nếu không bị Ban -> Đăng nhập thành công
+                currentUser = userIn;
+                document.getElementById("user-display").innerText = currentUser;
+                document.getElementById("login-section").classList.add("hidden");
+                document.getElementById("game-section").classList.remove("hidden");
+                drawWheel();
+            } else {
+                alert("Tên đăng nhập hoặc mật khẩu không đúng!");
+            }
         }
-      });
-    }
 
-    function startNode(id) {
-      const node = ROADMAP_NODES.find(n => n.id === id);
-      if (node.type === 'lesson') {
-        alert(`📚 Hoàn thành bài học: ${node.title}!`);
-        unlockNextNode(id);
-        addReward(node.xp, node.cups, node.title);
-      } else if (node.type === 'quiz' || node.type === 'boss') {
-        openQuiz(node);
-      }
-    }
-
-    function unlockNextNode(currentId) {
-      if (!currentUser.unlockedNodes.includes(currentId + 1)) {
-        currentUser.unlockedNodes.push(currentId + 1);
-        renderRoadmap();
-      }
-    }
-
-    /* QUIZ & BOSS ENGINE */
-    function openQuiz(node) {
-      currentQuizData = { node, score: 0, currentQ: 0, questions: generateQuestions(node.type === 'boss' ? 10 : 5) };
-      document.getElementById('quizTitle').textContent = node.title;
-      document.getElementById('quizModal').style.display = 'flex';
-      renderQuizQuestion();
-    }
-
-    function generateQuestions(count) {
-      const qBank = [
-        { q: "Python là ngôn ngữ lập trình gì?", a: ["Thông dịch", "Biên dịch", "Thẻ đánh dấu", "Siêu văn bản"], correct: 0 },
-        { q: "Cú pháp in ra màn hình trong Python?", a: ["console.log()", "print()", "System.out.println()", "echo"], correct: 1 },
-        { q: "Thẻ HTML nào tạo đường dẫn?", a: ["<a>", "<img>", "<link>", "<script>"], correct: 0 },
-        { q: "Thuộc tính CSS đổi màu chữ?", a: ["background", "font-style", "color", "text-align"], correct: 2 },
-        { q: "Đâu là kiểu dữ liệu số nguyên trong Python?", a: ["float", "int", "string", "bool"], correct: 1 }
-      ];
-      return Array(count).fill(0).map(() => qBank[Math.floor(Math.random() * qBank.length)]);
-    }
-
-    function renderQuizQuestion() {
-      const quiz = currentQuizData;
-      const q = quiz.questions[quiz.currentQ];
-      let html = `<p><b>Câu ${quiz.currentQ + 1}/${quiz.questions.length}: ${q.q}</b></p>`;
-      q.a.forEach((opt, idx) => {
-        html += `<label style="display:block; margin: 8px 0;"><input type="radio" name="ans" value="${idx}"> ${opt}</label>`;
-      });
-      document.getElementById('quizContent').innerHTML = html;
-    }
-
-    function submitQuiz() {
-      const selected = document.querySelector('input[name="ans"]:checked');
-      if (selected && parseInt(selected.value) === currentQuizData.questions[currentQuizData.currentQ].correct) {
-        currentQuizData.score++;
-      }
-      currentQuizData.currentQ++;
-      if (currentQuizData.currentQ < currentQuizData.questions.length) {
-        renderQuizQuestion();
-      } else {
-        closeModal('quizModal');
-        const total = currentQuizData.questions.length;
-        const passed = currentQuizData.score / total >= 0.6;
-        currentUser.quizzesTaken = (currentUser.quizzesTaken || 0) + 1;
-        currentUser.correctAnswers = (currentUser.correctAnswers || 0) + currentQuizData.score;
-
-        if (passed) {
-          alert(`🎉 XONG BÀI! Đúng ${currentQuizData.score}/${total} câu.`);
-          unlockNextNode(currentQuizData.node.id);
-          addReward(currentQuizData.node.xp, currentQuizData.node.cups, "Hoàn thành " + currentQuizData.node.title);
-        } else {
-          alert(`❌ BẠN ĐÃ THẤT BẠI! Đúng ${currentQuizData.score}/${total} câu. Hãy thử lại!`);
+        function logout() {
+            currentUser = null;
+            document.getElementById("login-section").classList.remove("hidden");
+            document.getElementById("game-section").classList.add("hidden");
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
         }
-        updateUI();
-      }
-    }
 
-    /* BATTLE ARENA */
-    function startBattle() {
-      const win = Math.random() > 0.4; // 60% tỉ lệ thắng ngẫu nhiên
-      if (win) {
-        currentUser.wins = (currentUser.wins || 0) + 1;
-        addReward(100, 300, "Thắng Đấu Trường Battle!");
-        alert("⚔️ VICTORY! Bạn đã xuất sắc đánh bại đối thủ!");
-      } else {
-        addReward(30, 0, "Thua Đấu Trường Battle");
-        alert("⚔️ DEFEAT! Đối thủ trả lời nhanh hơn. Cố gắng lần sau!");
-      }
-      completeMission('battle');
-    }
+        // --- HÀM BAN TÀI KHOẢN (GIỮ TÀI KHOẢN, CHỈ KHÓA VÀ LƯU LÝ DO) ---
+        function banUser() {
+            const target = document.getElementById("ban-target").value.trim();
+            const reason = document.getElementById("ban-reason").value.trim();
 
-    /* MYSTERY BOX & WHEEL */
-    function openWheelModal() { document.getElementById('wheelModal').style.display = 'flex'; }
-    
-    function spinWheel() {
-      const wheel = document.getElementById('wheelEl');
-      const deg = 1440 + Math.floor(Math.random() * 360);
-      wheel.style.transform = `rotate(${deg}deg)`;
-      document.getElementById('spinBtn').disabled = true;
-      setTimeout(() => {
-        const rewardCups = [100, 500, 1000, 50, 200, 2000][Math.floor(Math.random() * 6)];
-        addReward(50, rewardCups, "Vòng quay may mắn");
-        document.getElementById('spinBtn').disabled = false;
-        closeModal('wheelModal');
-      }, 4000);
-    }
+            if (!target || !reason) {
+                alert("Vui lòng nhập đầy đủ tên tài khoản và lý do Ban!");
+                return;
+            }
 
-    function openMysteryBox(type, cost) {
-      if (currentUser.trophies < cost) return alert("❌ Không đủ Cúp!");
-      currentUser.trophies -= cost;
-      let bonus = 0;
-      if (type === 'bronze') bonus = Math.floor(Math.random() * 100) + 50;
-      if (type === 'silver') bonus = Math.floor(Math.random() * 600) + 200;
-      if (type === 'gold') bonus = Math.floor(Math.random() * 2500) + 500;
-      if (type === 'legendary') bonus = Math.floor(Math.random() * 12000) + 3000;
-      
-      addReward(50, bonus, `Mở ${type.toUpperCase()} Box`);
-      alert(`🎁 BẠN NHẬN ĐƯỢC ${bonus} CÚP!`);
-    }
+            if (usersDB[target]) {
+                usersDB[target].isBanned = true;
+                usersDB[target].banReason = reason;
+                alert(`Đã Ban tài khoản "${target}". Tài khoản vẫn lưu trên hệ thống nhưng người dùng sẽ thấy lý do Ban khi đăng nhập.`);
+                document.getElementById("ban-target").value = "";
+                document.getElementById("ban-reason").value = "";
+            } else {
+                alert("Không tìm thấy tài khoản này trong hệ thống!");
+            }
+        }
 
-    /* ADMIN PANEL MODULE */
-    function openAdminModal() {
-      document.getElementById('adminModal').style.display = 'flex';
-      showAdminSection('users');
-    }
+        // --- VẼ VÒNG QUAY VỚI CHỮ ---
+        const canvas = document.getElementById("wheel");
+        const ctx = canvas.getContext("2d");
+        const numPrizes = prizes.length;
+        const arcSize = (2 * Math.PI) / numPrizes;
 
-    function showAdminSection(sec) {
-      const content = document.getElementById('adminContent');
-      if (sec === 'users') {
-        let html = `<table class="admin-table">
-          <tr><th>User</th><th>Rank/XP</th><th>Cúp</th><th>Thao tác</th></tr>`;
-        Object.keys(usersDB).forEach(u => {
-          html += `<tr>
-            <td>${usersDB[u].name} (${u})</td>
-            <td>${usersDB[u].xp} XP</td>
-            <td>${usersDB[u].trophies}</td>
-            <td>
-              <button onclick="adminAddCups('${u}')">+Cúp</button>
-              <button onclick="adminDeleteUser('${u}')" style="color:red;">Xóa</button>
-            </td>
-          </tr>`;
-        });
-        html += `</table>`;
-        content.innerHTML = html;
-      } else {
-        content.innerHTML = `<p>Tổng số học viên: <b>${Object.keys(usersDB).length}</b></p>`;
-      }
-    }
+        function drawWheel() {
+            for (let i = 0; i < numPrizes; i++) {
+                const angle = i * arcSize;
+                
+                // Vẽ ô màu
+                ctx.beginPath();
+                ctx.fillStyle = colors[i];
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, angle, angle + arcSize);
+                ctx.lineTo(150, 150);
+                ctx.fill();
 
-    function adminAddCups(u) {
-      usersDB[u].trophies += 500;
-      saveDB();
-      showAdminSection('users');
-      if (currentUser.username === u) updateUI();
-    }
+                // Vẽ chữ trên từng ô
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 16px Arial";
+                ctx.fillText(prizes[i], 130, 5);
+                ctx.restore();
+            }
+        }
 
-    function adminDeleteUser(u) {
-      if (u === 'admin') return alert("Không thể xóa Admin!");
-      delete usersDB[u];
-      saveDB();
-      showAdminSection('users');
-    }
+        // --- QUAY VÒNG QUAY ---
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            document.getElementById("result-text").innerText = "";
 
-    /* SHOP SYSTEM */
-    function renderShop() {
-      const grid = document.getElementById('shopGrid');
-      grid.innerHTML = '';
-      shopItems.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div>
-            <div class="card-icon">${item.icon}</div>
-            <div class="card-title">${item.name}</div>
-            <div class="card-price">🏆 ${item.price.toLocaleString()} Cúp</div>
-          </div>
-          <button class="btn-action">Đổi Quà</button>
-        `;
-        card.querySelector('.btn-action').onclick = () => openCheckoutModal(item);
-        grid.appendChild(card);
-      });
-    }
+            // Tính toán góc quay ngẫu nhiên (tối thiểu quay 5 vòng = 1800 độ)
+            const randomDegree = Math.floor(Math.random() * 360) + 1800;
+            currentRotation += randomDegree;
 
-    function openCheckoutModal(item) {
-      currentSelectedItem = item;
-      document.getElementById('selectedItemTxt').textContent = `${item.name} (${item.price} Cúp)`;
-      document.getElementById('checkoutModal').style.display = 'flex';
-    }
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
 
-    function processOrder() {
-      if (currentUser.trophies < currentSelectedItem.price && !currentUser.isAdmin) {
-        return alert("❌ Bạn không đủ Cúp!");
-      }
-      if (!currentUser.isAdmin) currentUser.trophies -= currentSelectedItem.price;
-      closeModal('checkoutModal');
-      updateUI();
-      alert("🎉 ĐỔI QUÀ THÀNH CÔNG! Ban tổ chức sẽ liên hệ giao hàng.");
-    }
-
-    /* UTILS & UI HELPERS */
-    function claimDailyReward() {
-      if (currentUser.claimedToday) return toast("🎁 Bạn đã nhận quà hôm nay rồi!");
-      currentUser.claimedToday = true;
-      addReward(50, 100, "Điểm danh hằng ngày");
-    }
-
-    function completeMission(id) {
-      if (!currentUser || currentUser.completedMissions.includes(id)) return;
-      currentUser.completedMissions.push(id);
-      const m = MISSIONS.find(x => x.id === id);
-      if (m) addReward(m.xp, m.cups, m.title);
-    }
-
-    function showMissions() {
-      const done = currentUser.completedMissions || [];
-      document.getElementById('generalModalTitle').textContent = "🎯 Nhiệm vụ VIP";
-      document.getElementById('generalModalContent').innerHTML = MISSIONS.map(m => {
-        const ok = done.includes(m.id);
-        return `<div class="mission ${ok ? 'done' : ''}">
-          <b>${ok ? '✅' : '⬜'} ${m.title}</b><br><span style="font-size:12px;color:#94a3b8">${m.desc}</span>
-          <div style="font-size:12px;margin-top:5px;color:#38bdf8;">🎁 +${m.xp} XP • +${m.cups} Cúp</div>
-        </div>`;
-      }).join('');
-      document.getElementById('generalModal').style.display = 'flex';
-    }
-
-    function showLeaderboard() {
-      const rows = Object.entries(usersDB).map(([username, u]) => ({ name: u.name, xp: u.xp }))
-        .sort((a, b) => b.xp - a.xp).slice(0, 10);
-      document.getElementById('generalModalTitle').textContent = "🏆 Bảng Xếp Hạng XP";
-      document.getElementById('generalModalContent').innerHTML = rows.map((r, i) =>
-        `<div class="leader-row"><span>#${i + 1} ${r.name}</span><b>${r.xp.toLocaleString()} XP</b></div>`
-      ).join('');
-      document.getElementById('generalModal').style.display = 'flex';
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      const btn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes(`'${tabId}'`));
-      if (btn) btn.classList.add('active');
-    }
-
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function toast(msg) {
-      const old = document.querySelector('.toast'); if (old) old.remove();
-      const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3000);
-    }
-  </script>
+            setTimeout(() => {
+                isSpinning = false;
+                
+                // Tính toán phần thưởng trúng
+                const actualDegrees = currentRotation % 360;
+                // Góc 0 độ của canvas nằm ở bên phải (3 giờ), kim chỉ ở trên đỉnh (12 giờ = 270 độ)
+                const symbolAngle = (360 - (actualDegrees % 360) + 270) % 360;
+                const index = Math.floor(symbolAngle / (360 / numPrizes));
+                
+                document.getElementById("result-text").innerText = "Chúc mừng! Bạn quay vào: " + prizes[index];
+            }, 4000);
+        }
+    </script>
 </body>
 </html>
